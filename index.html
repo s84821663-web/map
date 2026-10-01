@@ -1,295 +1,645 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cyber World Map</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+<title>CYBER TERMINAL</title>
 
-        body {
-            margin: 0;
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden;
-            background: #020605;
-            font-family: monospace;
-            color: #00ff88;
-        }
+<style>
+* {
+    box-sizing: border-box;
+}
 
-        .screen {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            background:
-                radial-gradient(circle at 50% 50%,
-                    rgba(0, 255, 120, 0.08),
-                    transparent 55%),
-                #020605;
-        }
+body {
+    margin: 0;
+    background: #010403;
+    color: #00ff88;
+    font-family: "Courier New", monospace;
+    overflow: hidden;
+}
 
-        .title {
-            position: absolute;
-            top: 25px;
-            left: 35px;
-            font-size: 18px;
-            letter-spacing: 4px;
-            text-shadow: 0 0 10px #00ff88;
-        }
+.container {
+    width: 100vw;
+    height: 100vh;
+    padding: 15px;
+    display: grid;
+    grid-template-columns: 1.7fr 1fr;
+    grid-template-rows: 55% 45%;
+    gap: 12px;
+    background:
+        radial-gradient(circle at 70% 30%, rgba(255,0,0,.08), transparent 30%),
+        radial-gradient(circle at 30% 50%, rgba(0,255,100,.08), transparent 40%);
+}
 
-        .status {
-            position: absolute;
-            top: 28px;
-            right: 35px;
-            font-size: 13px;
-            color: #ff3030;
-            text-shadow: 0 0 8px red;
-        }
+/* HEADER */
 
-        .map {
-            position: absolute;
-            left: 5%;
-            right: 5%;
-            top: 12%;
-            bottom: 12%;
-            opacity: 0.9;
-        }
+.header {
+    position: absolute;
+    top: 10px;
+    left: 20px;
+    right: 20px;
 
-        .map svg {
-            width: 100%;
-            height: 100%;
-        }
+    display: flex;
+    justify-content: space-between;
 
-        .grid {
-            position: absolute;
-            inset: 0;
+    color: #00ff88;
+    font-size: 13px;
+    letter-spacing: 3px;
+}
 
-            background-image:
-                linear-gradient(
-                    rgba(0, 255, 120, 0.04) 1px,
-                    transparent 1px
-                ),
-                linear-gradient(
-                    90deg,
-                    rgba(0, 255, 120, 0.04) 1px,
-                    transparent 1px
-                );
+.online {
+    color: #ff3030;
+    text-shadow: 0 0 10px red;
+}
 
-            background-size: 35px 35px;
+/* PANELS */
 
-            pointer-events: none;
-        }
+.panel {
+    border: 1px solid rgba(0,255,130,.35);
+    background: rgba(0,15,10,.75);
+    box-shadow:
+        inset 0 0 30px rgba(0,255,100,.03),
+        0 0 15px rgba(0,255,100,.08);
 
-        .scan {
-            position: absolute;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: #00ff88;
-            box-shadow: 0 0 15px #00ff88;
-            opacity: 0.25;
+    position: relative;
+    overflow: hidden;
+}
 
-            animation: scan 5s linear infinite;
-        }
+.panel-title {
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(0,255,130,.25);
+    font-size: 11px;
+    letter-spacing: 2px;
+}
 
-        @keyframes scan {
-            from {
-                top: 0;
-            }
+/* MAP */
 
-            to {
-                top: 100%;
-            }
-        }
+.map-panel {
+    grid-row: 1;
+    grid-column: 1;
+}
 
-        .location {
-            position: absolute;
-            width: 7px;
-            height: 7px;
-            background: #ff3030;
-            border-radius: 50%;
-            box-shadow:
-                0 0 8px red,
-                0 0 20px red;
+.map {
+    width: 100%;
+    height: calc(100% - 35px);
+    position: relative;
+}
 
-            animation: pulse 1.5s infinite;
-        }
+.map svg {
+    width: 100%;
+    height: 100%;
+}
 
-        @keyframes pulse {
-            0%, 100% {
-                transform: scale(1);
-                opacity: 1;
-            }
+.continent {
+    fill: #063b2b;
+    stroke: #00ff88;
+    stroke-width: 1.5;
+    filter: drop-shadow(0 0 4px #00ff88);
+}
 
-            50% {
-                transform: scale(1.8);
-                opacity: 0.4;
-            }
-        }
+/* CONNECTION LINES */
 
-        .bottom {
-            position: absolute;
-            bottom: 25px;
-            left: 35px;
-            right: 35px;
+.connection {
+    stroke: #ff3030;
+    stroke-width: 1;
+    stroke-dasharray: 5 5;
+    animation: flow 1s linear infinite;
+}
 
-            display: flex;
-            justify-content: space-between;
+@keyframes flow {
+    to {
+        stroke-dashoffset: -20;
+    }
+}
 
-            font-size: 11px;
-            opacity: 0.7;
-            letter-spacing: 2px;
-        }
+/* TARGETS */
 
-        .coordinates {
-            color: #00ff88;
-        }
-    </style>
+.target {
+    fill: #ff3030;
+    filter: drop-shadow(0 0 8px red);
+    animation: pulse 1.2s infinite;
+}
+
+@keyframes pulse {
+    50% {
+        opacity: .3;
+        transform: scale(1.5);
+    }
+}
+
+/* TERMINAL */
+
+.terminal {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+.logs {
+    padding: 12px;
+    height: calc(100% - 35px);
+    overflow: hidden;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.log {
+    animation: appear .2s;
+}
+
+.red {
+    color: #ff3030;
+}
+
+.yellow {
+    color: #ffd000;
+}
+
+.blue {
+    color: #00b7ff;
+}
+
+@keyframes appear {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* CODE */
+
+.code-panel {
+    grid-column: 1;
+    grid-row: 2;
+}
+
+.code {
+    padding: 15px;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #00eaff;
+}
+
+.keyword {
+    color: #ff3cac;
+}
+
+.string {
+    color: #ffd000;
+}
+
+.number {
+    color: #00ff88;
+}
+
+/* SYSTEM */
+
+.system {
+    grid-column: 2;
+    grid-row: 2;
+    padding: 15px;
+}
+
+.stat {
+    margin: 13px 0;
+}
+
+.stat-name {
+    font-size: 11px;
+    margin-bottom: 5px;
+}
+
+.bar {
+    width: 100%;
+    height: 7px;
+    background: #06120e;
+    border: 1px solid #073c2b;
+}
+
+.fill {
+    height: 100%;
+    background: #00ff88;
+    box-shadow: 0 0 10px #00ff88;
+}
+
+.red-fill {
+    background: #ff3030;
+    box-shadow: 0 0 10px red;
+}
+
+/* SCAN */
+
+.scan {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: #00ff88;
+    box-shadow: 0 0 15px #00ff88;
+    opacity: .2;
+
+    animation: scan 4s linear infinite;
+}
+
+@keyframes scan {
+    from {
+        top: 35px;
+    }
+
+    to {
+        top: 100%;
+    }
+}
+
+/* CRT EFFECT */
+
+.container::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+
+    background:
+        repeating-linear-gradient(
+            0deg,
+            rgba(255,255,255,.015),
+            rgba(255,255,255,.015) 1px,
+            transparent 1px,
+            transparent 4px
+        );
+
+    pointer-events: none;
+}
+
+/* BLINK */
+
+.blink {
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    50% {
+        opacity: .2;
+    }
+}
+
+</style>
 </head>
 
 <body>
 
-<div class="screen">
+<div class="container">
 
-    <div class="title">
-        GLOBAL NETWORK // 01
-    </div>
+<div class="header">
+    <span>CYBER // COMMAND CENTER</span>
+    <span class="online">● SYSTEM ONLINE</span>
+</div>
 
-    <div class="status">
-        ● SYSTEM ONLINE
-    </div>
 
-    <div class="map">
+<!-- MAP -->
 
-        <!-- نقشه ساده قاره‌ها -->
-        <svg viewBox="0 0 1000 500"
-             xmlns="http://www.w3.org/2000/svg">
+<div class="panel map-panel">
 
-            <g fill="#063d2c"
-               stroke="#00ff88"
-               stroke-width="1.5"
-               opacity="0.9">
+<div class="panel-title">
+    GLOBAL NETWORK // VISUALIZATION
+</div>
 
-                <!-- North America -->
-                <path d="
-                M80 130
-                L130 80
-                L210 70
-                L260 110
-                L230 160
-                L180 170
-                L150 220
-                L110 200
-                L100 160
-                Z"/>
+<div class="map">
 
-                <!-- South America -->
-                <path d="
-                M260 240
-                L310 260
-                L330 320
-                L300 390
-                L270 430
-                L250 370
-                L260 320
-                L240 280
-                Z"/>
+<svg viewBox="0 0 1000 500">
 
-                <!-- Europe -->
-                <path d="
-                M470 115
-                L510 90
-                L560 105
-                L575 135
-                L540 155
-                L490 150
-                Z"/>
+<!-- NORTH AMERICA -->
 
-                <!-- Asia -->
-                <path d="
-                M550 120
-                L630 90
-                L740 110
-                L830 150
-                L850 210
-                L770 230
-                L690 210
-                L620 180
-                L560 165
-                Z"/>
+<path class="continent"
+d="
+M70 120
+L130 70
+L210 75
+L270 120
+L250 165
+L190 170
+L160 220
+L110 190
+L100 150
+Z"/>
 
-                <!-- Africa -->
-                <path d="
-                M500 190
-                L570 180
-                L620 230
-                L600 310
-                L550 360
-                L510 320
-                L490 260
-                Z"/>
+<!-- SOUTH AMERICA -->
 
-                <!-- Australia -->
-                <path d="
-                M760 330
-                L830 310
-                L880 340
-                L870 390
-                L800 410
-                L750 380
-                Z"/>
+<path class="continent"
+d="
+M260 235
+L315 260
+L325 320
+L300 390
+L270 440
+L245 370
+L255 315
+L235 275
+Z"/>
 
-            </g>
+<!-- EUROPE -->
 
-            <!-- خطوط شبکه -->
-            <g
-                stroke="#00ff88"
-                stroke-width="0.5"
-                opacity="0.25">
+<path class="continent"
+d="
+M470 110
+L510 85
+L560 100
+L580 130
+L540 150
+L490 145
+Z"/>
 
-                <line x1="0" y1="100" x2="1000" y2="100"/>
-                <line x1="0" y1="200" x2="1000" y2="200"/>
-                <line x1="0" y1="300" x2="1000" y2="300"/>
-                <line x1="0" y1="400" x2="1000" y2="400"/>
+<!-- ASIA -->
 
-                <line x1="100" y1="0" x2="100" y2="500"/>
-                <line x1="200" y1="0" x2="200" y2="500"/>
-                <line x1="300" y1="0" x2="300" y2="500"/>
-                <line x1="400" y1="0" x2="400" y2="500"/>
-                <line x1="500" y1="0" x2="500" y2="500"/>
-                <line x1="600" y1="0" x2="600" y2="500"/>
-                <line x1="700" y1="0" x2="700" y2="500"/>
-                <line x1="800" y1="0" x2="800" y2="500"/>
-                <line x1="900" y1="0" x2="900" y2="500"/>
+<path class="continent"
+d="
+M550 120
+L630 85
+L730 105
+L825 145
+L850 200
+L780 225
+L690 205
+L620 175
+L560 160
+Z"/>
 
-            </g>
+<!-- AFRICA -->
 
-        </svg>
+<path class="continent"
+d="
+M500 185
+L570 175
+L620 230
+L600 310
+L550 365
+L510 320
+L490 255
+Z"/>
 
-    </div>
+<!-- AUSTRALIA -->
 
-    <!-- نقاط قرمز روی نقشه -->
-    <div class="location" style="left: 27%; top: 42%;"></div>
-    <div class="location" style="left: 50%; top: 38%;"></div>
-    <div class="location" style="left: 67%; top: 43%;"></div>
-    <div class="location" style="left: 76%; top: 55%;"></div>
-    <div class="location" style="left: 54%; top: 60%;"></div>
+<path class="continent"
+d="
+M750 325
+L825 305
+L885 340
+L875 390
+L800 415
+L745 375
+Z"/>
 
-    <div class="grid"></div>
-    <div class="scan"></div>
 
-    <div class="bottom">
-        <span>NETWORK: SECURE</span>
-        <span class="coordinates">
-            LAT 40.7128° // LON 74.0060°
-        </span>
-        <span>PACKETS: 184,293</span>
-    </div>
+<!-- CONNECTIONS -->
+
+<line class="connection"
+x1="150" y1="150"
+x2="530" y2="130"/>
+
+<line class="connection"
+x1="530" y1="130"
+x2="700" y2="160"/>
+
+<line class="connection"
+x1="530" y1="130"
+x2="550" y2="280"/>
+
+<line class="connection"
+x1="550" y1="280"
+x2="800" y2="360"/>
+
+<line class="connection"
+x1="270" y1="270"
+x2="550" y2="280"/>
+
+
+<!-- TARGETS -->
+
+<circle class="target" cx="150" cy="150" r="5"/>
+<circle class="target" cx="530" cy="130" r="5"/>
+<circle class="target" cx="700" cy="160" r="5"/>
+<circle class="target" cx="550" cy="280" r="5"/>
+<circle class="target" cx="800" cy="360" r="5"/>
+
+</svg>
 
 </div>
+
+<div class="scan"></div>
+
+</div>
+
+
+<!-- TERMINAL -->
+
+<div class="panel terminal">
+
+<div class="panel-title">
+    TERMINAL // LIVE ACTIVITY
+</div>
+
+<div class="logs" id="logs"></div>
+
+</div>
+
+
+<!-- CODE -->
+
+<div class="panel code-panel">
+
+<div class="panel-title">
+    SOURCE // ENCRYPTED SESSION
+</div>
+
+<div class="code">
+
+<span class="keyword">const</span> network = {<br>
+
+&nbsp;&nbsp;status:
+<span class="string">"ONLINE"</span>,<br>
+
+&nbsp;&nbsp;nodes:
+<span class="number">1284</span>,<br>
+
+&nbsp;&nbsp;security:
+<span class="string">"ACTIVE"</span>,<br>
+
+&nbsp;&nbsp;encryption:
+<span class="string">"AES-256"</span><br>
+
+};<br><br>
+
+<span class="keyword">function</span> scanNetwork() {<br>
+
+&nbsp;&nbsp;<span class="keyword">let</span> packets =
+<span class="number">184293</span>;<br>
+
+&nbsp;&nbsp;<span class="keyword">return</span> packets;<br>
+
+}<br><br>
+
+&gt; initialize_visual_interface();<br>
+
+&gt; load_global_nodes();<br>
+
+&gt; monitor_connections();<br>
+
+&gt; system_ready();
+
+</div>
+
+</div>
+
+
+<!-- SYSTEM -->
+
+<div class="panel system">
+
+<div class="panel-title">
+    SYSTEM MONITOR
+</div>
+
+<div class="stat">
+
+<div class="stat-name">
+CPU // <span id="cpu">73</span>%
+</div>
+
+<div class="bar">
+<div class="fill" id="cpuBar" style="width:73%"></div>
+</div>
+
+</div>
+
+
+<div class="stat">
+
+<div class="stat-name">
+MEMORY // <span id="ram">61</span>%
+</div>
+
+<div class="bar">
+<div class="fill" id="ramBar" style="width:61%"></div>
+</div>
+
+</div>
+
+
+<div class="stat">
+
+<div class="stat-name">
+NETWORK // <span id="net">89</span>%
+</div>
+
+<div class="bar">
+<div class="red-fill" id="netBar" style="width:89%"></div>
+</div>
+
+</div>
+
+
+<br>
+
+<div class="red blink">
+● INTRUSION DETECTION: ACTIVE
+</div>
+
+<br>
+
+<div>
+NODES: 1,284<br>
+PACKETS: 184,293<br>
+UPTIME: 17:42:08<br>
+PROTOCOL: ENCRYPTED
+</div>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* FAKE TERMINAL LOGS */
+
+const logs = document.getElementById("logs");
+
+const messages = [
+
+"Initializing secure interface...",
+"Loading network visualization...",
+"Scanning virtual nodes...",
+"Connection established.",
+"Analyzing encrypted packets...",
+"Node 192.168.0.14 detected.",
+"Node 10.0.0.24 detected.",
+"Routing simulation started.",
+"Encryption layer active.",
+"Firewall status: ACTIVE.",
+"Monitoring global network...",
+"Packet stream synchronized.",
+"Threat simulation: LOW.",
+"Visual scanner online.",
+"System operating normally."
+
+];
+
+let index = 0;
+
+function addLog() {
+
+    const line = document.createElement("div");
+
+    line.className = "log";
+
+    const time =
+        new Date().toLocaleTimeString();
+
+    line.innerHTML =
+        `<span class="blue">[${time}]</span> ${messages[index]}`;
+
+    logs.appendChild(line);
+
+    if (logs.children.length > 12) {
+        logs.removeChild(logs.firstChild);
+    }
+
+    index++;
+
+    if (index >= messages.length) {
+        index = 0;
+    }
+}
+
+setInterval(addLog, 700);
+
+for(let i = 0; i < 8; i++) {
+    addLog();
+}
+
+
+/* FAKE SYSTEM STATS */
+
+function randomStats() {
+
+    let cpu = Math.floor(Math.random() * 35) + 55;
+    let ram = Math.floor(Math.random() * 25) + 50;
+    let net = Math.floor(Math.random() * 30) + 65;
+
+    document.getElementById("cpu").innerText = cpu;
+    document.getElementById("ram").innerText = ram;
+    document.getElementById("net").innerText = net;
+
+    document.getElementById("cpuBar").style.width = cpu + "%";
+    document.getElementById("ramBar").style.width = ram + "%";
+    document.getElementById("netBar").style.width = net + "%";
+}
+
+setInterval(randomStats, 1000);
+
+</script>
 
 </body>
 </html>
